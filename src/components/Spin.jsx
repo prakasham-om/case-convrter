@@ -14,24 +14,36 @@ export default function TextFormatter() {
     textRef.current.value = textRef.current.value.toLowerCase();
   };
 
-  // ✅ Title Case (with Acronyms + Hyphens)
-  const toTitleCase = () => {
-    const el = textRef.current;
-    el.value = el.value
-      .split(/\s+/)
-      .map((word) => {
-        if (acronyms.includes(word.toUpperCase())) return word.toUpperCase();
-        return word
-          .split("-")
-          .map((part) =>
-            acronyms.includes(part.toUpperCase())
-              ? part.toUpperCase()
-              : part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
-          )
-          .join("-");
-      })
-      .join(" ");
-  };
+
+// Build a canonical map from your acronyms array
+const ACRONYM_MAP = new Map(acronyms.map(a => [a.toUpperCase(), a]));
+
+const toTitleCase = () => {
+  const el = textRef.current;
+
+  el.value = el.value
+    .trim()
+    .split(/\s+/)
+    .map((word, index) => {
+      const upper = word.toUpperCase();
+
+      // ✅ If it's an acronym, return the correct casing (e.g., IoT, WiFi, SoC)
+      if (ACRONYM_MAP.has(upper)) {
+        return ACRONYM_MAP.get(upper);
+      }
+
+      // ✅ Handle small words (and, or, in, on, etc.)
+      const smallWords = ["and","or","if","of","in","on","at","to","for","by","with","a","an"];
+      if (smallWords.includes(word.toLowerCase()) && index !== 0) {
+        return word.toLowerCase();
+      }
+
+      // ✅ Default Title Case
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    })
+    .join(" ");
+};
+
 
   // ✅ Sentence Case
   const toSentenceCase = () => {
