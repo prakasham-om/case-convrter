@@ -23,9 +23,10 @@ const toTitleCase = () => {
 
   el.value = el.value
     .trim()
+    // remove spaces around hyphens
+    .replace(/\s*-\s*/g, "-")
     .split(/\s+/)
     .map((word, index) => {
-      // Split on hyphens so "Ai-powered" is treated as ["Ai", "powered"]
       const parts = word.split("-").map((part, partIndex) => {
         const upper = part.toUpperCase();
 
@@ -34,7 +35,7 @@ const toTitleCase = () => {
           return ACRONYM_MAP.get(upper);
         }
 
-        // ✅ Handle small words (but not first word or after hyphen)
+        // ✅ Handle small words
         const smallWords = ["and","or","if","of","in","on","at","to","for","by","with","a","an"];
         if (smallWords.includes(part.toLowerCase()) && index !== 0 && partIndex !== 0) {
           return part.toLowerCase();
@@ -48,6 +49,7 @@ const toTitleCase = () => {
     })
     .join(" ");
 };
+
 
 
   // ✅ Sentence Case
