@@ -25,21 +25,26 @@ const toTitleCase = () => {
     .trim()
     .split(/\s+/)
     .map((word, index) => {
-      const upper = word.toUpperCase();
+      // Split on hyphens so "Ai-powered" is treated as ["Ai", "powered"]
+      const parts = word.split("-").map((part, partIndex) => {
+        const upper = part.toUpperCase();
 
-      // ✅ If it's an acronym, return the correct casing (e.g., IoT, WiFi, SoC)
-      if (ACRONYM_MAP.has(upper)) {
-        return ACRONYM_MAP.get(upper);
-      }
+        // ✅ Handle acronyms
+        if (ACRONYM_MAP.has(upper)) {
+          return ACRONYM_MAP.get(upper);
+        }
 
-      // ✅ Handle small words (and, or, in, on, etc.)
-      const smallWords = ["and","or","if","of","in","on","at","to","for","by","with","a","an"];
-      if (smallWords.includes(word.toLowerCase()) && index !== 0) {
-        return word.toLowerCase();
-      }
+        // ✅ Handle small words (but not first word or after hyphen)
+        const smallWords = ["and","or","if","of","in","on","at","to","for","by","with","a","an"];
+        if (smallWords.includes(part.toLowerCase()) && index !== 0 && partIndex !== 0) {
+          return part.toLowerCase();
+        }
 
-      // ✅ Default Title Case
-      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        // ✅ Default Title Case
+        return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
+      });
+
+      return parts.join("-");
     })
     .join(" ");
 };
