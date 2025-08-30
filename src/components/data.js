@@ -1,13 +1,12 @@
 const acronyms = [
   // Technology
-  "AI", "ML", "NLP", "DL", "IoT", "AR", "VR", "XR",
-  "UI", "UX", "API", "SDK", "IDE", "SQL", "DBMS",
-  "HTML", "CSS", "JS", "JSON", "XML", "YAML",
-  "IP", "TCP", "UDP", "HTTP", "HTTPS", "FTP", "SSH",
+  "AI", "ML", "NLP", "DL", "IoT","SaaS", "AR", "VR", "XR",
+  "UI", "UX", "API", "SDK", "IDE","SQL","DBMS",
+  "HTML", "CSS", "JS", "JSON", "XML","YAML",
+  "IP", "TCP", "UDP", "HTTP", "HTTPS", "FTP","SSH",
   "DNS", "VPN", "URL", "URI", "PDF", "CSV", "GIF",
   "CPU", "GPU", "RAM", "ROM", "BIOS", "OS", "PC",
-  "USB", "SSD", "HDD", "VPS", "AWS", "GCP",
-
+  "USB", "SSD", "HDD", "VPS", "AWS", "GCP","SAP",
 
   "RF", "IR", "NFC", "RFID", "DC", "AC",
   "LED", "LCD", "OLED", "HDMI", "VGA",
@@ -16,7 +15,6 @@ const acronyms = [
   "GSM", "CDMA", "LTE", "5G", "4G", "3G", "WiFi",
   "LAN", "WAN", "PAN", "MAN", "NVR", "DVR",
   "EEPROM", "PROM", "EPROM", "NVMe", "eMMC", "SD", "TF",
-
 
 
   "3PL", "4PL", "SCM", "WMS", "TMS",

@@ -23,7 +23,9 @@ const toTitleCase = () => {
 
   el.value = el.value
     .trim()
-    // remove spaces around hyphens
+    // 🔹 Replace "&" with "and"
+    .replace(/\s*&\s*/g, " and ")
+    // 🔹 Remove spaces around hyphens
     .replace(/\s*-\s*/g, "-")
     .split(/\s+/)
     .map((word, index) => {
@@ -36,10 +38,12 @@ const toTitleCase = () => {
         }
 
         // ✅ Handle small words
-        const smallWords = ["and","or","if","of","in","on","at","to","for","by","with","a","an"];
-        if (smallWords.includes(part.toLowerCase()) && index !== 0 && partIndex !== 0) {
+        const smallWords = [
+          "and", "or", "if", "of", "in", "on", "at", "to", "for", "by", "with", "a", "an"
+        ];
+       if (smallWords.includes(part.toLowerCase()) && index !== 0) {
           return part.toLowerCase();
-        }
+          }
 
         // ✅ Default Title Case
         return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
@@ -49,6 +53,7 @@ const toTitleCase = () => {
     })
     .join(" ");
 };
+
 
 
 
