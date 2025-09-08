@@ -6,7 +6,7 @@ const acronyms = [
   "IP", "TCP", "UDP", "HTTP", "HTTPS", "FTP","SSH",
   "DNS", "VPN", "URL", "URI", "PDF", "CSV", "GIF",
   "CPU", "GPU", "RAM", "ROM", "BIOS", "OS", "PC",
-  "USB", "SSD", "HDD", "VPS", "AWS", "GCP","SAP",
+  "USB", "SSD", "HDD", "VPS", "AWS", "GCP","SAP","IT",
 
   "RF", "IR", "NFC", "RFID", "DC", "AC",
   "LED", "LCD", "OLED", "HDMI", "VGA", "SLT",
