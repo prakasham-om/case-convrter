@@ -30,7 +30,7 @@ const toTitleCase = () => {
       const parts = word.split("-").map((part, partIndex) => {
         const upper = part.toUpperCase();
 
-        
+        // ✅ Check for acronyms
         if (ACRONYM_MAP.has(upper)) {
           return ACRONYM_MAP.get(upper);
         }
@@ -39,12 +39,22 @@ const toTitleCase = () => {
         const smallWords = [
           "and", "or", "if", "of", "in", "on", "at", "to", "for", "by", "with", "a", "an"
         ];
-       if (smallWords.includes(part.toLowerCase()) && index !== 0) {
+        if (smallWords.includes(part.toLowerCase()) && index !== 0) {
           return part.toLowerCase();
-          }
+        }
+
+        // ✅ Singularize common plurals (basic rule: remove trailing 's' / 'es')
+        let singular = part;
+        if (/ies$/i.test(singular)) {
+          singular = singular.replace(/ies$/i, "y"); // e.g., "Technologies" → "Technology"
+        } else if (/ses$/i.test(singular)) {
+          singular = singular.replace(/ses$/i, "s"); // e.g., "Processes" → "Process"
+        } else if (/s$/i.test(singular) && singular.length > 3) {
+          singular = singular.replace(/s$/i, ""); // e.g., "Solutions" → "Solution"
+        }
 
         // ✅ Default Title Case
-        return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
+        return singular.charAt(0).toUpperCase() + singular.slice(1).toLowerCase();
       });
 
       return parts.join("-");
