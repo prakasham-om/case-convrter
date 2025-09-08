@@ -126,7 +126,7 @@ const toTitleCase = () => {
           </button>
           <button
             onClick={toTitleCase}
-            className="bg-purple-500 text-white px-3 py-1 text-xs rounded-lg shadow hover:bg-purple-600 transition transition"
+            className="bg-purple-700 text-white px-3 py-1 text-xs rounded-lg shadow hover:bg-purple-900 transition transition"
           >
             Title Case   ⭐
           </button>
