@@ -4,12 +4,10 @@ import acronyms from "./data";
 export default function TextFormatter() {
   const textRef = useRef();
 
-  // ✅ Uppercase
   const toUpperCase = () => {
     textRef.current.value = textRef.current.value.toUpperCase();
   };
 
-  // ✅ Lowercase
   const toLowerCase = () => {
     textRef.current.value = textRef.current.value.toLowerCase();
   };
@@ -32,7 +30,7 @@ const toTitleCase = () => {
       const parts = word.split("-").map((part, partIndex) => {
         const upper = part.toUpperCase();
 
-        // ✅ Handle acronyms
+        
         if (ACRONYM_MAP.has(upper)) {
           return ACRONYM_MAP.get(upper);
         }

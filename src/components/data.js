@@ -14,7 +14,7 @@ const acronyms = [
   "PSU", "SMPS", "UPS", "CCTV", "GPS",
   "GSM", "CDMA", "LTE", "5G", "4G", "3G", "WiFi",
   "LAN", "WAN", "PAN", "MAN", "NVR", "DVR",
-  "EEPROM", "PROM", "EPROM", "NVMe", "eMMC", "SD", "TF",
+  "EEPROM", "PROM", "EPROM", "NVMe", "eMMC", "SD", "TF","CBD",
 
 
   "3PL", "4PL", "SCM", "WMS", "TMS",
