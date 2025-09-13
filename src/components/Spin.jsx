@@ -1,5 +1,6 @@
 import React, { useRef, useState } from "react";
 import acronyms from "./data";
+import pluralize from "pluralize";
 
 export default function TextFormatter() {
   const textRef = useRef();
@@ -26,41 +27,65 @@ export default function TextFormatter() {
 
   const ACRONYM_MAP = new Map(acronyms.map((a) => [a.toUpperCase(), a]));
 
-  const toTitleCase = () => {
-    const el = textRef.current;
 
-    el.value = el.value
-      .trim()
-      .replace(/\s*&\s*/g, " and ")
-      .replace(/\s*-\s*/g, "-")
-      .split(/\s+/)
-      .map((word, index) => {
-        const parts = word.split("-").map((part) => {
-          const upper = part.toUpperCase();
-          if (ACRONYM_MAP.has(upper)) return ACRONYM_MAP.get(upper);
+const toTitleCase = () => {
+  const el = textRef.current;
 
-          const smallWords = [
-            "and","or","if","of","in","on","at","to","for","by","with","a","an"
-          ];
-          if (smallWords.includes(part.toLowerCase()) && index !== 0) {
-            return part.toLowerCase();
-          }
+  const allowedSmallWords = new Set(["and", "or"]);
+  const wordsToRemove = new Set([
+    "a", "an", "as", "at", "but", "by", "for", "if", "in", "nor",
+    "of", "on", "the", "to", "vs", "via", "with"
+  ]);
 
-          let singular = part;
-          if (/ies$/i.test(singular)) singular = singular.replace(/ies$/i, "y");
-          else if (/ses$/i.test(singular)) singular = singular.replace(/ses$/i, "s");
-          else if (/s$/i.test(singular) && singular.length > 3)
-            singular = singular.replace(/s$/i, "");
+  // Words that end with 's' but are singular & should NOT be singularized
+ const uncountableSingulars = new Set([
+  "business", "news", "mathematics", "physics", "economics",
+  "ethics", "linguistics", "politics", "statistics",
+  "measles", "diabetes", "series", "species", "athletics",
+  "gymnastics", "molasses", "crossroads", "headquarters",
+  "means", "newsreels", "shears", "premises", "scissors",
+  "outskirts", "works"
+]);
 
-          return singular.charAt(0).toUpperCase() + singular.slice(1).toLowerCase();
-        });
+  const capitalize = (word) =>
+    word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
 
-        return parts.join("-");
-      })
-      .join(" ");
+  el.value = el.value
+    .trim()
+    .replace(/\s*&\s*/g, " and ") // Replace & with and
+    .replace(/\s*-\s*/g, "-")     // Clean hyphens
+    .split(/\s+/)
+    .filter((word) => !wordsToRemove.has(word.toLowerCase())) // Remove unwanted small words
+    .map((word, index) => {
+      const parts = word.split("-").map((part) => {
+        const upper = part.toUpperCase();
 
-    autoCopy();
-  };
+        if (ACRONYM_MAP.has(upper)) return ACRONYM_MAP.get(upper);
+
+        const lower = part.toLowerCase();
+
+        // Check if word is uncountable singular before singularizing
+        const singular = uncountableSingulars.has(lower)
+          ? part
+          : pluralize.isPlural(part)
+            ? pluralize.singular(part)
+            : part;
+
+        // Keep "and"/"or" lowercase unless first word
+        if (allowedSmallWords.has(singular.toLowerCase()) && index !== 0) {
+          return singular.toLowerCase();
+        }
+
+        return capitalize(singular);
+      });
+
+      return parts.join("-");
+    })
+    .join(" ");
+
+  autoCopy();
+};
+
 
   const toSentenceCase = () => {
     const el = textRef.current;
@@ -100,7 +125,7 @@ export default function TextFormatter() {
         {/* textarea */}
         <textarea
           ref={textRef}
-          className="flex-1 w-full h-[300px] border rounded-xl p-4 text-gray-700 focus:ring-2 focus:ring-blue-400 focus:outline-none resize-none text-base"
+          className="flex-1 w-full h-[300px] border rounded-xl p-4 text-gray-700 focus:ring-2 focus:ring-blue-300 focus:outline-none resize-none text-base"
           placeholder="Enter your text here..."
         />
 
@@ -113,25 +138,25 @@ export default function TextFormatter() {
 
         {/* action buttons */}
         <div className="flex flex-wrap gap-2 mt-4 justify-center">
-          <button onClick={toUpperCase} className="bg-blue-500 text-white px-3 py-1 text-xs rounded-lg shadow hover:bg-blue-600 opacity-40 hover:opacity-100">
+          <button onClick={toUpperCase} className="bg-blue-500 text-white px-3 py-1 text-xs rounded-lg shadow hover:bg-blue-600 opacity-30 hover:opacity-100">
             UPPERCASE
           </button>
-          <button onClick={toLowerCase} className="bg-green-500 text-white px-3 py-1 text-xs rounded-lg shadow hover:bg-green-600 opacity-40 hover:opacity-100">
+          <button onClick={toLowerCase} className="bg-green-500 text-white px-3 py-1 text-xs rounded-lg shadow hover:bg-green-600 opacity-30 hover:opacity-100">
             lowercase
           </button>
-          <button onClick={toTitleCase} className="bg-purple-700 text-white px-3 py-1 text-xs rounded-lg shadow hover:bg-purple-900 ">
+          <button onClick={toTitleCase} className="bg-purple-900 text-white px-3 py-1 text-xs rounded-lg shadow hover:bg-purple-900 ">
             Title Case ⭐
           </button>
-          <button onClick={toSentenceCase} className="bg-yellow-600 text-white px-3 py-1 text-xs rounded-lg shadow hover:bg-yellow-700 opacity-40 hover:opacity-100">
+          <button onClick={toSentenceCase} className="bg-yellow-600 text-white px-3 py-1 text-xs rounded-lg shadow hover:bg-yellow-700 opacity-30 hover:opacity-100">
             Sentence Case
           </button>
-          <button onClick={toCapitalize} className="bg-indigo-500 text-white px-3 py-1 text-xs rounded-lg shadow hover:bg-indigo-600 opacity-40 hover:opacity-100">
+          <button onClick={toCapitalize} className="bg-indigo-500 text-white px-3 py-1 text-xs rounded-lg shadow hover:bg-indigo-600 opacity-30 hover:opacity-100">
             Capitalize
           </button>
-          <button onClick={toInverse} className="bg-pink-500 text-white px-3 py-1 text-xs rounded-lg shadow hover:bg-pink-600 opacity-40 hover:opacity-100">
+          <button onClick={toInverse} className="bg-pink-500 text-white px-3 py-1 text-xs rounded-lg shadow hover:bg-pink-600 opacity-30 hover:opacity-100">
             iNvErSe
           </button>
-          <button onClick={clearText} className="bg-red-500 text-white px-3 py-1 text-xs rounded-lg shadow hover:bg-red-600 opacity-40 hover:opacity-100">
+          <button onClick={clearText} className="bg-red-500 text-white px-3 py-1 text-xs rounded-lg shadow hover:bg-red-600 opacity-30 hover:opacity-100">
             Clear
           </button>
         </div>
