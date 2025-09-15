@@ -7,8 +7,10 @@ export default function App() {
 
   const handleGenerate = async () => {
   try {
-    const res = await axios.post("http://localhost:8080/api/generate", {
-      userInput: input.trim(),   // <-- make sure no empty string
+      
+      const res = await axios.post("http://localhost:8080/api/generate", {
+      userInput: input.trim(), 
+      
     });
     setOutput(res.data.output);
   } catch (err) {

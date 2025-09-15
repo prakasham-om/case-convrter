@@ -1,5 +1,6 @@
-const acronyms = [
-  // Technology
+const acronyms =[
+
+  
   "AI", "ML", "NLP", "DL", "IoT","SaaS", "AR", "VR", "XR",
   "UI", "UX", "API", "SDK", "IDE","SQL","DBMS",
   "HTML", "CSS", "JS", "JSON", "XML","YAML",
@@ -19,50 +20,15 @@ const acronyms = [
   "LAN", "WAN", "PAN", "MAN", "NVR", "DVR",
   "EEPROM", "PROM", "EPROM", "NVMe", "eMMC", "SD", "TF","CBD",
 
-
   "3PL", "4PL", "SCM", "WMS", "TMS",
   "LTL", "FTL", "SKU", "MRP",
 
 
-  "B2B", // Business to Business
-  "B2C", // Business to Consumer
-  "C2C", // Consumer to Consumer
-  "C2B", // Consumer to Business
-  "D2C", // Direct to Consumer
-  "O2O",  // E-Commerce (short form)
-  "POS", // Point of Sale
-  "COD", // Cash on Delivery
-  "MRP", // Maximum Retail Price (also in logistics)
-  "MSRP", // Manufacturer's Suggested Retail Price
-  "RMA", // Return Merchandise Authorization
-  "KPI", // Key Performance Indicator
-  "AOV", // Average Order Value
-  "GMV", // Gross Merchandise Value
-  "ROI", // Return on Investment
-  "LTV", // Lifetime Value
-  "CAC", // Customer Acquisition Cost
-  "CLV", // Customer Lifetime Value
-  "CTR", // Click-Through Rate
-  "CPC", // Cost Per Click
-  "CPM", // Cost Per Mille (1000 impressions)
-  "SEO", // Search Engine Optimization
-  "SEM", // Search Engine Marketing
-  "SMM", // Social Media Marketing
-  "PPC", // Pay-Per-Click
-  "CRM", // Customer Relationship Management
-  "ERP", // Enterprise Resource Planning
+  "B2B", "B2C", "C2C", "C2B", "D2C", "O2O", "POS",  "COD", "MRP", "MSRP", "RMA","KPI", "AOV", "GMV", "ROI", "LTV", "CAC", "CLV", "CTR", "CPC", "CPM", "SEO", 
+  "SEM", "SMM", "PPC", "CRM", "ERP", "CEO", "CTO", "CFO", "COO", "HR", "PR",
 
-  // Business / Organizations
-  "CEO", "CTO", "CFO", "COO", "HR", "PR",
+  "USA", "UK", "UAE", "EU", "UN", "NASA", "ISRO", "MBA", "BSc", "MSc", "PhD", "SAT", "GRE", "TOEFL", "IELTS", "FYI", "ASAP", "DIY", "FAQ", "ETA", "OK", "ATM", "PIN", "SIM"
 
-  // Countries / Places
-  "USA", "UK", "UAE", "EU", "UN", "NASA", "ISRO",
-
-  // Education
-  "MBA", "BSc", "MSc", "PhD", "SAT", "GRE", "TOEFL", "IELTS",
-
-  // Miscellaneous
-  "FYI", "ASAP", "DIY", "FAQ", "ETA", "OK", "ATM", "PIN", "SIM"
 ];
 
 export default acronyms;

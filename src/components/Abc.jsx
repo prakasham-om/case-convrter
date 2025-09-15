@@ -7,10 +7,11 @@ const Abc=()=>{
 
    const getDomain = () => {
       
-      
+
    };
 
     return(
+        
         <>
             <input type="text" placeholder="Enter email"
             value={email}

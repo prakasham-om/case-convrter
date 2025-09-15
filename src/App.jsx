@@ -4,11 +4,9 @@ import AiSgortner from './components/AiSgortner';
 import Abc from './components/Abc';
 const App=() => {
   return (
-    <div>
-      
-  
+    <>
       <Spin />
-    </div>
+    </>
   );
 }
 export default App;

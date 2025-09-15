@@ -3,10 +3,10 @@ import acronyms from "./data";
 import pluralize from "pluralize";
 
 export default function TextFormatter() {
+
   const textRef = useRef();
   const [copied, setCopied] = useState(false);
 
-  // 🔹 helper to copy automatically
   const autoCopy = () => {
     if (textRef.current && textRef.current.value.trim()) {
       navigator.clipboard.writeText(textRef.current.value);
@@ -32,24 +32,23 @@ const toTitleCase = () => {
   const el = textRef.current;
 
   const allowedSmallWords = new Set(["and", "or"]);
+
   const wordsToRemove = new Set([
     "a", "an", "as", "at", "but", "by", "for", "if", "in", "nor",
     "of", "on", "the", "to", "vs", "via", "with"
   ]);
 
-  // Words that end with 's' but are singular & should NOT be singularized
  const uncountableSingulars = new Set([
   "business", "news", "mathematics", "physics", "economics",
   "ethics", "linguistics", "politics", "statistics",
   "measles", "diabetes", "series", "species", "athletics",
   "gymnastics", "molasses", "crossroads", "headquarters",
   "means", "newsreels", "shears", "premises", "scissors",
-  "outskirts", "works"
+  "outskirts", "works" ,"data"
 ]);
 
   const capitalize = (word) =>
-    word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-
+  word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
   el.value = el.value
     .trim()
     .replace(/\s*&\s*/g, " and ") // Replace & with and
@@ -64,14 +63,13 @@ const toTitleCase = () => {
 
         const lower = part.toLowerCase();
 
-        // Check if word is uncountable singular before singularizing
         const singular = uncountableSingulars.has(lower)
           ? part
           : pluralize.isPlural(part)
             ? pluralize.singular(part)
             : part;
 
-        // Keep "and"/"or" lowercase unless first word
+
         if (allowedSmallWords.has(singular.toLowerCase()) && index !== 0) {
           return singular.toLowerCase();
         }
