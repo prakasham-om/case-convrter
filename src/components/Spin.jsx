@@ -44,7 +44,7 @@ const toTitleCase = () => {
   "measles", "diabetes", "series", "species", "athletics",
   "gymnastics", "molasses", "crossroads", "headquarters",
   "means", "newsreels", "shears", "premises", "scissors",
-  "outskirts", "works" ,"data"
+  "outskirts", "works" ,"data","cannabis"
 ]);
 
   const capitalize = (word) =>
