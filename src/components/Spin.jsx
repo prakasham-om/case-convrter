@@ -38,38 +38,44 @@ const toTitleCase = () => {
     "of", "on", "the", "to", "vs", "via", "with"
   ]);
 
- const uncountableSingulars = new Set([
-  "business", "news", "mathematics", "physics", "economics",
-  "ethics", "linguistics", "politics", "statistics",
-  "measles", "diabetes", "series", "species", "athletics",
-  "gymnastics", "molasses", "crossroads", "headquarters",
-  "means", "newsreels", "shears", "premises", "scissors",
-  "outskirts", "works" ,"data","cannabis"
-]);
+  const uncountableSingulars = new Set([
+    "business", "news", "mathematics", "physics", "economics",
+    "ethics", "linguistics", "politics", "statistics",
+    "measles", "diabetes", "series", "species", "athletics",
+    "gymnastics", "molasses", "crossroads", "headquarters",
+    "means", "newsreels", "shears", "premises", "scissors",
+    "outskirts", "works", "data", "cannabis"
+  ]);
 
   const capitalize = (word) =>
-  word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+
   el.value = el.value
     .trim()
-    .replace(/\s*&\s*/g, " and ") // Replace & with and
-    .replace(/\s*-\s*/g, "-")     // Clean hyphens
+    .replace(/[^\w\s-]/g, "")         // ✅ Remove all special characters except hyphen
+    .replace(/\s*&\s*/g, " and ")     // Replace & with 'and'
+    .replace(/\s*-\s*/g, "-")         // Clean up spaces around hyphens
     .split(/\s+/)
     .filter((word) => !wordsToRemove.has(word.toLowerCase())) // Remove unwanted small words
     .map((word, index) => {
       const parts = word.split("-").map((part) => {
         const upper = part.toUpperCase();
 
+        // Handle acronym map (if exists)
         if (ACRONYM_MAP.has(upper)) return ACRONYM_MAP.get(upper);
 
         const lower = part.toLowerCase();
 
-        const singular = uncountableSingulars.has(lower)
-          ? part
-          : pluralize.isPlural(part)
-            ? pluralize.singular(part)
-            : part;
+        // Skip uncountable nouns
+        if (uncountableSingulars.has(lower)) return capitalize(part);
 
+        // ✅ Remove plural 's' if not uncountable and longer than 3 letters
+        let singular = part;
+        if (part.length > 3 && part.endsWith("s")) {
+          singular = part.slice(0, -1);
+        }
 
+        // Keep allowed small words in lowercase if not first
         if (allowedSmallWords.has(singular.toLowerCase()) && index !== 0) {
           return singular.toLowerCase();
         }
@@ -83,6 +89,7 @@ const toTitleCase = () => {
 
   autoCopy();
 };
+
 
 
   const toSentenceCase = () => {
