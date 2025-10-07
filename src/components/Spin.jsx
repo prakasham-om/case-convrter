@@ -68,7 +68,11 @@ const uncountable = new Set(["business", "news", "mathematics", "physics", "econ
           if (uncountable.has(part.toLowerCase())) return capitalize(part);
 
           let singular = part;
+          if (part.length > 5 && part.endsWith("ies")) singular = part.slice(0, -3) + "y";
+          if (part.length > 4 && part.endsWith("es")) singular = part.slice(0, -2);
           if (part.length > 3 && part.endsWith("s")) singular = part.slice(0, -1);
+          
+          
           if (allowedSmallWords.has(singular.toLowerCase()) && index !== 0)
             return singular.toLowerCase();
 
@@ -91,7 +95,7 @@ const uncountable = new Set(["business", "news", "mathematics", "physics", "econ
 
   const toCapitalize = () => {
     const el = textRef.current;
-    el.value = el.value.replace(/\b\w/g, (c) => c.toUpperCase());
+    el.value = el.value.replace(/\b\w/g, (c) => c.toUpperCase());cls
     autoCopy();
   };
 
@@ -111,13 +115,13 @@ const uncountable = new Set(["business", "news", "mathematics", "physics", "econ
   };
 
   const buttons = [
-    { label: "UPPERCASE", color: "blue", onClick: toUpperCase },
-    { label: "lowercase", color: "green", onClick: toLowerCase },
-    { label: "Title Case ⭐", color: "purple", onClick: toTitleCase },
-    { label: "Sentence Case", color: "yellow", onClick: toSentenceCase },
-    { label: "Capitalize", color: "indigo", onClick: toCapitalize },
-    { label: "iNvErSe", color: "pink", onClick: toInverse },
-    { label: "Clear", color: "red", onClick: clearText },
+    { label: "UPPERCASE", color: "gray-500", onClick: toUpperCase },
+    { label: "lowercase", color: "gray-500", onClick: toLowerCase },
+    { label: "Title Case", color: "purple-800", onClick: toTitleCase },
+    { label: "Sentence Case", color: "gray-500", onClick: toSentenceCase },
+    { label: "Capitalize", color: "gray-500", onClick: toCapitalize },
+    { label: "iNvErSe", color: "gray-500", onClick: toInverse },
+    { label: "Clear", color: "red-600", onClick: clearText },
   ];
 
   return (
@@ -126,8 +130,8 @@ const uncountable = new Set(["business", "news", "mathematics", "physics", "econ
         <div className="w-full h-full bg-[url('/medical-shadow.svg')] bg-no-repeat bg-center bg-cover opacity-10"></div>
       </div>
       <div className="relative z-10 bg-[#e8ebee] shadow-xl rounded-3xl p-8 sm:p-10 md:p-12 w-full max-w-5xl min-h-[60vh] flex flex-col">
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-center mb-6 text-gray-700 tracking-tight">
-          Text Formatter
+        <h1 className="text-xl sm:text-xl md:text-3xl font-bold text-center mb-6 text-gray-500 tracking-tight">
+          Case Converter 
         </h1>
 
         {/* Textarea */}
@@ -151,23 +155,26 @@ const uncountable = new Set(["business", "news", "mathematics", "physics", "econ
         </div>
 
         <div className="flex flex-wrap gap-3 mt-8 justify-center">
-          {buttons.map((btn, idx) => {
-            const isActive = btn.label === "Title Case ⭐";
-            return (
-              <button
-                key={idx}
-                onClick={btn.onClick}
-                className={`bg-[#e8ebee] text-${btn.color}-600 px-4 py-2 text-xs sm:text-sm md:text-sm font-semibold rounded-xl shadow-md`}
-                style={{
-                  boxShadow: "3px 3px 6px #c1c4c8, -3px -3px 6px #ffffff",
-                  opacity: isActive ? 1 : 0.3,
-                  cursor: "pointer",
-                }}
-              >
-                {btn.label}
-              </button>
-            );
-          })}
+  {buttons.map((btn, idx) => {
+    const isActive = btn.label === "Title Case";
+    return (
+      <button
+        key={idx}
+        onClick={btn.onClick}
+        className={`relative bg-[#e8ebee] text-${btn.color} px-4 py-2 ${!isActive ? " blur-[.5px] hover:blur-none" : "blur-none"} text-xs sm:text-sm md:text-sm font-semibold rounded-xl shadow-md`}
+        style={{
+          boxShadow: "3px 3px 6px #c1c4c8, -3px -3px 6px #ffffff",
+          cursor: "pointer",
+        }}
+      >
+        {btn.label}
+        {/* Green dot for active button */}
+        {isActive && (
+          <span className="absolute  right-1 w-2 h-2 bg-green-500 rounded-full shadow-md" />
+        )}
+      </button>
+    );
+  })}
         </div>
 
         <p className="mt-10 text-center text-gray-500 text-xs sm:text-sm">
