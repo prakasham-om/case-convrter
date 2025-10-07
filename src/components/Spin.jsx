@@ -37,13 +37,19 @@ export default function TextFormatter() {
       "a", "an", "as", "at", "but", "by", "for", "if", "in", "nor",
       "of", "on", "the", "to", "vs", "via", "with"
     ]);
-    const uncountable = new Set([
-      "business", "news", "mathematics", "physics", "economics",
-      "ethics", "linguistics", "politics", "statistics", "measles",
-      "diabetes", "series", "species", "athletics", "gymnastics",
-      "molasses", "crossroads", "headquarters", "means", "newsreels",
-      "shears", "premises", "scissors", "outskirts", "works", "data", "cannabis"
-    ]);
+const uncountable = new Set(["business", "news", "mathematics", "physics", "economics",
+   "ethics", "linguistics", "politics", "statistics", "measles", "diabetes", "series", "species",
+    "athletics", "gymnastics", "analytics", "barracks", "headquarters", "means", "newsreels", "premises",
+    "works", "crossroads", "outskirts", "molasses", "clothes", "jeans", "shorts", "trousers", "pajamas", "scales",
+    "tongs", "pliers", "spectacles", "shears", "scissors", "physics", "politics", "linguistics", "economics",
+    "statistics", "ethics", "gymnastics", "analytics", "mathematics", "diabetes", "news", "physics", "mathematics",
+    "physics", "economics", "analytics", "robotics", "genetics", "optics", "electronics", "aerodynamics", "mechanics",
+    "dynamics", "thermodynamics", "semantics", "phonetics", "pragmatics", "hydraulics", "acoustics", "aesthetics",
+    "epidemiomics", "cryogenics", "microelectronics", "nanotechnics", "geophysics", "biophysics", "cybernetics",
+    "ergonomics", "kinematics", "psycholinguistics", "sociolinguistics", "psychotics", "econometrics", "politics", 
+    "analytics", "mathematics", "physics", "linguistics", "statistics", "genomics", "metaphysics", "neurogenetics",
+    "semantics", "pharmacogenomics", "electronics", "mechanics", "optics", "economics", "physics"]);
+
 
     const capitalize = (w) =>
       w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
@@ -115,13 +121,10 @@ export default function TextFormatter() {
   ];
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative bg-[#e8ebee] p-4 sm:p-8 overflow-hidden">
-      {/* Background soft pattern */}
+    <div className="min-h-screen flex items-center justify-center relative bg-[#e8ebee] p-4 sm:p-8 overflow-hidden">  
       <div className="absolute inset-0 z-0">
         <div className="w-full h-full bg-[url('/medical-shadow.svg')] bg-no-repeat bg-center bg-cover opacity-10"></div>
       </div>
-
-      {/* Neumorphic Card */}
       <div className="relative z-10 bg-[#e8ebee] shadow-xl rounded-3xl p-8 sm:p-10 md:p-12 w-full max-w-5xl min-h-[60vh] flex flex-col">
         <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-center mb-6 text-gray-700 tracking-tight">
           Text Formatter
@@ -147,7 +150,6 @@ export default function TextFormatter() {
           )}
         </div>
 
-        {/* Buttons */}
         <div className="flex flex-wrap gap-3 mt-8 justify-center">
           {buttons.map((btn, idx) => {
             const isActive = btn.label === "Title Case ⭐";
