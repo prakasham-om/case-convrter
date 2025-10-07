@@ -47,7 +47,7 @@ const uncountable = new Set(["business", "news", "mathematics", "physics", "econ
     "dynamics", "thermodynamics", "semantics", "phonetics", "pragmatics", "hydraulics", "acoustics", "aesthetics",
     "epidemiomics", "cryogenics", "microelectronics", "nanotechnics", "geophysics", "biophysics", "cybernetics",
     "ergonomics", "kinematics", "psycholinguistics", "sociolinguistics", "psychotics", "econometrics", "politics", 
-    "analytics", "mathematics", "physics", "linguistics", "statistics", "genomics", "metaphysics", "neurogenetics",
+    "analytics", "mathematics", "physics", "linguistics", "statistics", "genomics", "metaphysics", "neurogenetics","cannabis",
     "semantics", "pharmacogenomics", "electronics", "mechanics", "optics", "economics", "physics"]);
 
 
