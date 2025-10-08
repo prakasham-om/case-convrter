@@ -20,3 +20,4 @@ const acronyms =[
 ];
 
 export default acronyms;
+// className={`px-4 py-2 bg-white/90 ${isTitleCase ? "text-purple-700" : "text-gray-500"} rounded-xl shadow-md hover:shadow-lg transition text-sm relative`} 
