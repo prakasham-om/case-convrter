@@ -6,7 +6,7 @@ const acronyms =[
   "RF", "IR", "NFC", "RFID", "DC", "AC","LED", "LCD", "OLED", "HDMI", "VGA", "SLT","USB", "TTL", "UART", "SPI", "I2C", "PWM",
   "ADC", "DAC", "PCB", "PCBA", "MCU", "DSP","ASIC", "FPGA", "SoC", "IoE","IC", "MCU", "DSP", "ASIC", "FPGA", "SoC", "IoE",
   "PSU", "SMPS", "UPS", "CCTV", "GPS","GSM", "CDMA", "LTE", "5G", "4G", "3G", "WiFi","LAN", "WAN", "PAN", "MAN", "NVR", "DVR","PV",
-  "EEPROM", "PROM", "EPROM", "NVMe", "eMMC", "SD", "TF","CBD","FDA",
+  "EEPROM", "PROM", "EPROM", "NVMe", "eMMC", "SD", "TF","CBD","FDA","OEM","ODM","BOM",
   "3PL", "4PL", "SCM", "WMS", "TMS","LTL", "FTL", "SKU", "MRP","EHR", "EMR", "HIS", "PACS", "LIS", "RIS", "CDSS", "HIE", "PHR", "HIPAA", "CMS",
   "BP", "HR", "RR", "SOB", "HTN", "DM", "COPD", "CAD", "MI", "CHF", "CKD","ICU", "NICU", "PICU", "ER", "ED", "OR", "OPD", "IPD", "OBGYN", "ENT", "PCP", "GP",
   "MRI", "CT", "USG", "XRA", "ECG", "EEG", "PET", "CBC", "BMP", "LFT", "RFT", "ABG",
