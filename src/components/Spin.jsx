@@ -1,6 +1,54 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useCallback, useMemo } from "react";
 import acronyms from "./data";
 import { FaServer, FaTimes } from "react-icons/fa";
+
+// Move static data outside component to prevent recreation
+const STATIC_SETS = {
+  UNCOUNTABLE: new Set([
+    "business", "news", "mathematics", "physics", "economics", "success", "analysis", 
+    "progress", "process", "dynamics", "pants", "sprorts", "trousers", "jeans", 
+    "shorts", "glasses", "clothes", "scissors", "headquarters", "series", "species",
+    "ethics", "linguistics", "politics", "statistics", "measles", "diabetes", 
+    "athletics", "gymnastics", "analytics", "barracks", "means", "newsreels", 
+    "premises", "works", "crossroads", "outskirts", "molasses", "pajamas", "scales", 
+    "tongs", "pliers", "spectacles", "shears", "robotics", "genetics", "optics", 
+    "electronics", "aerodynamics", "mechanics", "thermodynamics", "semantics", 
+    "phonetics", "pragmatics", "hydraulics", "acoustics", "aesthetics", "epidemiomics", 
+    "cryogenics", "microelectronics", "nanotechnics", "geophysics", "biophysics", 
+    "cybernetics", "ergonomics", "kinematics", "psycholinguistics", "sociolinguistics", 
+    "psychotics", "econometrics", "genomics", "metaphysics", "neurogenetics", "cannabis", 
+    "pharmacogenomics"
+  ]),
+  WORDS_TO_REMOVE: new Set([
+    "a", "an", "as", "at", "but", "by", "for", "if", "in", "nor", "of", "on", 
+    "the", "to", "vs", "via", "with"
+  ]),
+  ALLOWED_SMALL_WORDS: new Set(["and", "or"])
+};
+
+const ACRONYM_MAP = new Map(acronyms.map(a => [a.toUpperCase(), a]));
+
+// Memoized button component to prevent re-renders
+const MemoizedButton = React.memo(({ label, color, onClick }) => (
+  <button
+    onClick={onClick}
+    className={`relative bg-[#e8ebee] text-${color} px-4 py-2 text-xs sm:text-sm md:text-sm font-semibold rounded-xl shadow-md`}
+    style={{ boxShadow: "3px 3px 6px #c1c4c8, -3px -3px 6px #ffffff", cursor: "pointer" }}
+  >
+    {label}
+  </button>
+));
+
+// Memoized word bank item component
+const WordBankItem = React.memo(({ word, onInsert, onRemove }) => (
+  <div className="group relative px-3 py-1 bg-white border border-blue-300 rounded-lg text-xs cursor-pointer hover:bg-blue-100 transition-colors">
+    <span onClick={() => onInsert(word)} className="pr-2">{word}</span>
+    <button
+      onClick={(e) => { e.stopPropagation(); onRemove(word); }}
+      className="opacity-0 group-hover:opacity-100 absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] transition-opacity hover:bg-red-600"
+    >×</button>
+  </div>
+));
 
 export default function TextFormatter() {
   const textRef = useRef();
@@ -15,9 +63,9 @@ export default function TextFormatter() {
   const redoStack = useRef([]);
   const maxStack = 100;
   const isCtrlPressed = useRef(false);
-  const lastSavedValue = useRef(""); // Track last saved value to avoid duplicates
+  const lastSavedValue = useRef("");
 
-  // Load word bank and bankActive from localStorage
+  // Load initial data
   useEffect(() => {
     try {
       const savedWordBank = localStorage.getItem("caseConverter_wordBank");
@@ -25,176 +73,154 @@ export default function TextFormatter() {
 
       if (savedWordBank) setWordBank(JSON.parse(savedWordBank));
       if (savedBankActive) setBankActive(JSON.parse(savedBankActive));
-    } catch (error) {}
-    finally { setIsLoaded(true); }
+    } catch (error) {
+      console.error("Error loading from localStorage:", error);
+    } finally { 
+      setIsLoaded(true); 
+    }
   }, []);
 
-  // Save word bank
+  // Save to localStorage - combined into one effect
   useEffect(() => {
     if (!isLoaded) return;
     localStorage.setItem("caseConverter_wordBank", JSON.stringify(wordBank));
-  }, [wordBank, isLoaded]);
-
-  // Save bankActive
-  useEffect(() => {
-    if (!isLoaded) return;
     localStorage.setItem("caseConverter_bankActive", JSON.stringify(bankActive));
-  }, [bankActive, isLoaded]);
+  }, [wordBank, bankActive, isLoaded]);
 
-  const toggleBank = () => setBankActive(prev => !prev);
+  // Memoized callbacks
+  const toggleBank = useCallback(() => setBankActive(prev => !prev), []);
 
-  // Handle text selection for auto adding to bank
-  const handleTextSelect = () => {
+  const handleTextSelect = useCallback(() => {
     if (!bankActive) return;
     const selection = window.getSelection().toString().trim();
-    if (selection && selection.length > 0 && !wordBank.includes(selection)) {
-      setWordBank(prev => [...prev, selection]);
+    if (selection && selection.length > 0) {
+      setWordBank(prev => 
+        prev.includes(selection) ? prev : [...prev, selection]
+      );
     }
-  };
+  }, [bankActive]);
 
-  const textInsert = (word) => {
+  // Undo/Redo logic - FIXED VERSION
+  const saveUndo = useCallback((value = null) => {
+    const currentValue = value !== null ? value : textRef.current.value;
+    
+    if (!undoStack.current.length || undoStack.current[undoStack.current.length - 1] !== currentValue) {
+      undoStack.current.push(currentValue);
+      if (undoStack.current.length > maxStack) undoStack.current.shift();
+      redoStack.current = [];
+      lastSavedValue.current = currentValue;
+    }
+  }, []);
+
+  const handleUndo = useCallback(() => {
+    if (undoStack.current.length > 1) {
+      const currentValue = textRef.current.value;
+      // Save current state to redo stack before undoing
+      redoStack.current.push(currentValue);
+      
+      // Remove current state and go to previous
+      undoStack.current.pop(); // Remove current
+      const previous = undoStack.current[undoStack.current.length - 1];
+      
+      textRef.current.value = previous;
+      lastSavedValue.current = previous;
+      setHasText(previous.trim().length > 0);
+    } else if (undoStack.current.length === 1) {
+      // If only one state left, clear the text
+      const currentValue = textRef.current.value;
+      redoStack.current.push(currentValue);
+      undoStack.current.pop();
+      textRef.current.value = "";
+      lastSavedValue.current = "";
+      setHasText(false);
+    }
+  }, []);
+
+  const handleRedo = useCallback(() => {
+    if (redoStack.current.length > 0) {
+      const currentValue = textRef.current.value;
+      const lastRedo = redoStack.current.pop();
+      
+      // Save current state to undo stack
+      undoStack.current.push(currentValue);
+      if (undoStack.current.length > maxStack) undoStack.current.shift();
+      
+      textRef.current.value = lastRedo;
+      lastSavedValue.current = lastRedo;
+      setHasText(lastRedo.trim().length > 0);
+    }
+  }, []);
+
+  const textInsert = useCallback((word) => {
     if (!bankActive) return;
     const currentText = textRef.current.value.trim();
     if (!currentText.split(/\s+/).includes(word)) {
-      saveUndo();
-      textRef.current.value = currentText ? currentText + " " + word : word;
-      handleInputChange({ target: { value: textRef.current.value } });
+      const newValue = currentText ? currentText + " " + word : word;
+      saveUndo(newValue);
+      textRef.current.value = newValue;
+      setHasText(newValue.trim().length > 0);
     }
-  };
+  }, [bankActive, saveUndo]);
 
-  const removeWord = (word) => setWordBank(prev => prev.filter(w => w !== word));
-  const clearBank = () => setWordBank([]);
+  const removeWord = useCallback((word) => 
+    setWordBank(prev => prev.filter(w => w !== word)), []);
 
-  const autoCopy = () => {
+  const clearBank = useCallback(() => setWordBank([]), []);
+
+  const autoCopy = useCallback(() => {
     if (textRef.current && textRef.current.value.trim()) {
       navigator.clipboard.writeText(textRef.current.value);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
-  };
+  }, []);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = useCallback((e) => {
     const value = e.target.value;
     setHasText(value.trim().length > 0);
     
-    // Save undo state when user types (with debouncing to avoid too many saves)
-    if (value !== lastSavedValue.current) {
-      saveUndo();
-      lastSavedValue.current = value;
-    }
-  };
+    // Use setTimeout to ensure we capture the final value after typing
+    setTimeout(() => {
+      if (textRef.current && textRef.current.value !== lastSavedValue.current) {
+        saveUndo();
+      }
+    }, 0);
+  }, [saveUndo]);
 
-  // Undo/Redo logic
-  const saveUndo = () => {
-    const value = textRef.current.value;
-    
-    // Only save if different from last undo state
-    if (!undoStack.current.length || undoStack.current[undoStack.current.length - 1] !== value) {
-      undoStack.current.push(value);
-      if (undoStack.current.length > maxStack) undoStack.current.shift();
-      redoStack.current = []; // Clear redo stack when new change is made
-    }
-  };
-
-  const handleUndo = () => {
-    if (undoStack.current.length > 1) {
-      // Save current state to redo stack before undoing
-      redoStack.current.push(textRef.current.value);
-      
-      // Remove current state and go to previous
-      const current = undoStack.current.pop();
-      const previous = undoStack.current[undoStack.current.length - 1];
-      
-      textRef.current.value = previous;
-      lastSavedValue.current = previous;
-      handleInputChange({ target: { value: previous } });
-    } else if (undoStack.current.length === 1) {
-      // If only one state left, clear the text
-      redoStack.current.push(textRef.current.value);
-      undoStack.current.pop();
-      textRef.current.value = "";
-      lastSavedValue.current = "";
-      handleInputChange({ target: { value: "" } });
-    }
-  };
-
-  const handleRedo = () => {
-    if (redoStack.current.length) {
-      const lastRedo = redoStack.current.pop();
-      undoStack.current.push(lastRedo);
-      textRef.current.value = lastRedo;
-      lastSavedValue.current = lastRedo;
-      handleInputChange({ target: { value: lastRedo } });
-    }
-  };
-
-  const handleKeyDown = (e) => {
+  const handleKeyDown = useCallback((e) => {
     if (e.ctrlKey || e.metaKey) {
       isCtrlPressed.current = true;
 
-      // Ctrl+Z or Cmd+Z for Undo
       if (e.key === 'z' && !e.shiftKey) {
         e.preventDefault();
         handleUndo();
       }
 
-      // Ctrl+Y or Ctrl+Shift+Z or Cmd+Shift+Z for Redo - FIXED THE SYNTAX ERROR HERE
       if ((e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
         e.preventDefault();
         handleRedo();
       }
     }
-  };
+  }, [handleUndo, handleRedo]);
 
-  const handleKeyUp = (e) => {
+  const handleKeyUp = useCallback((e) => {
     if (!e.ctrlKey && !e.metaKey) {
       isCtrlPressed.current = false;
     }
-  };
+  }, []);
 
   // Initialize undo stack with empty value
   useEffect(() => {
     if (textRef.current) {
-      undoStack.current.push(textRef.current.value);
-      lastSavedValue.current = textRef.current.value;
+      const initialValue = textRef.current.value;
+      undoStack.current.push(initialValue);
+      lastSavedValue.current = initialValue;
     }
   }, []);
 
-  // Text transformations
-  const ACRONYM_MAP = new Map(acronyms.map(a => [a.toUpperCase(), a]));
-
-  const toTitleCase = () => transformText(titleCaseTransform);
-  const toUpperCase = () => transformText(val => val.toUpperCase());
-  const toLowerCase = () => transformText(val => val.toLowerCase());
-  const toSentenceCase = () => transformText(val => val.toLowerCase().replace(/(^\s*\w|[.!?]\s*\w)/g, c => c.toUpperCase()));
-  const toCapitalize = () => transformText(val => val.replace(/\b\w/g, c => c.toUpperCase()));
-  const toInverse = () => transformText(val => val.split("").map(c => c === c.toUpperCase() ? c.toLowerCase() : c.toUpperCase()).join(""));
-  const clearText = () => { saveUndo(); textRef.current.value = ""; handleInputChange({ target: { value: "" } }); };
-
-  const transformText = (fn) => {
-    saveUndo();
-    textRef.current.value = fn(textRef.current.value);
-    handleInputChange({ target: { value: textRef.current.value } });
-    autoCopy();
-  };
-
-  const titleCaseTransform = (str) => {
-    const allowedSmallWords = new Set(["and", "or"]);
-    const wordsToRemove = new Set(["a","an","as","at","but","by","for","if","in","nor","of","on","the","to","vs","via","with"]);
-    const uncountable = new Set([
-      "business","news","mathematics","physics","economics","success","analysis","progress","process","dynamics","pants",
-      "sprorts","trousers","jeans","shorts","glasses","clothes","scissors","headquarters","series","species",
-      "ethics","linguistics","politics","statistics","measles","diabetes","series","species","athletics","gymnastics",
-      "analytics","barracks","headquarters","means","newsreels","premises","works","crossroads","outskirts","molasses",
-      "clothes","jeans","shorts","trousers","pajamas","scales","tongs","pliers","spectacles","shears","scissors","physics",
-      "politics","linguistics","economics","statistics","ethics","gymnastics","analytics","mathematics","diabetes","news",
-      "physics","mathematics","physics","economics","analytics","robotics","genetics","optics","electronics","aerodynamics",
-      "mechanics","dynamics","thermodynamics","semantics","phonetics","pragmatics","hydraulics","acoustics","aesthetics",
-      "epidemiomics","cryogenics","microelectronics","nanotechnics","geophysics","biophysics","cybernetics","ergonomics",
-      "kinematics","psycholinguistics","sociolinguistics","psychotics","econometrics","politics","analytics","mathematics",
-      "physics","linguistics","statistics","genomics","metaphysics","neurogenetics","cannabis","semantics","pharmacogenomics",
-      "electronics","mechanics","optics","economics","physics"
-    ]);
+  // Memoized text transformations
+  const titleCaseTransform = useCallback((str) => {
+    const { UNCOUNTABLE, WORDS_TO_REMOVE, ALLOWED_SMALL_WORDS } = STATIC_SETS;
 
     const capitalize = w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
 
@@ -204,28 +230,61 @@ export default function TextFormatter() {
       .replace(/[^\w\s-]/g, "")
       .replace(/\s*-\s*/g, "-")
       .split(/\s+/)
-      .filter(w => !wordsToRemove.has(w.toLowerCase()))
+      .filter(w => !WORDS_TO_REMOVE.has(w.toLowerCase()))
       .map((word, index) => {
         const parts = word.split("-").map(part => {
           const upper = part.toUpperCase();
           if (ACRONYM_MAP.has(upper)) return ACRONYM_MAP.get(upper);
-          if (uncountable.has(part.toLowerCase())) return capitalize(part);
+          if (UNCOUNTABLE.has(part.toLowerCase())) return capitalize(part);
 
           let singular = part;
           if (part.toLowerCase().endsWith("ies") && part.length > 3) singular = part.slice(0, -3) + "y";
           else if (part.toLowerCase().endsWith("es") && part.length > 3) singular = part.slice(0, -2);
           else if (part.toLowerCase().endsWith("s") && part.length > 3) singular = part.slice(0, -1);
 
-          if (allowedSmallWords.has(singular.toLowerCase()) && index !== 0)
+          if (ALLOWED_SMALL_WORDS.has(singular.toLowerCase()) && index !== 0)
             return singular.toLowerCase();
           return capitalize(singular);
         });
         return parts.join("-");
       })
       .join(" ");
-  };
+  }, []);
 
-  const buttons = [
+  // Fixed transformation functions - save undo state properly
+  const transformText = useCallback((fn) => {
+    const currentValue = textRef.current.value;
+    const newValue = fn(currentValue);
+    
+    // Save the state BEFORE transformation for undo
+    saveUndo(currentValue);
+    
+    // Apply transformation
+    textRef.current.value = newValue;
+    setHasText(newValue.trim().length > 0);
+    lastSavedValue.current = newValue;
+    
+    autoCopy();
+  }, [saveUndo, autoCopy]);
+
+  // Memoized transformation functions
+  const toTitleCase = useCallback(() => transformText(titleCaseTransform), [transformText, titleCaseTransform]);
+  const toUpperCase = useCallback(() => transformText(val => val.toUpperCase()), [transformText]);
+  const toLowerCase = useCallback(() => transformText(val => val.toLowerCase()), [transformText]);
+  const toSentenceCase = useCallback(() => transformText(val => val.toLowerCase().replace(/(^\s*\w|[.!?]\s*\w)/g, c => c.toUpperCase())), [transformText]);
+  const toCapitalize = useCallback(() => transformText(val => val.replace(/\b\w/g, c => c.toUpperCase())), [transformText]);
+  const toInverse = useCallback(() => transformText(val => val.split("").map(c => c === c.toUpperCase() ? c.toLowerCase() : c.toUpperCase()).join("")), [transformText]);
+  
+  const clearText = useCallback(() => { 
+    const currentValue = textRef.current.value;
+    saveUndo(currentValue);
+    textRef.current.value = ""; 
+    setHasText(false);
+    lastSavedValue.current = "";
+  }, [saveUndo]);
+
+  // Memoized buttons array
+  const buttons = useMemo(() => [
     { label: "UPPERCASE", color: "gray-500", onClick: toUpperCase },
     { label: "lowercase", color: "gray-500", onClick: toLowerCase },
     { label: "Title Case", color: "purple-800", onClick: toTitleCase },
@@ -233,14 +292,26 @@ export default function TextFormatter() {
     { label: "Capitalize", color: "gray-500", onClick: toCapitalize },
     { label: "iNvErSe", color: "gray-500", onClick: toInverse },
     { label: "Clear", color: "red-600", onClick: clearText },
-  ];
+  ], [toUpperCase, toLowerCase, toTitleCase, toSentenceCase, toCapitalize, toInverse, clearText]);
+
+  // Memoized word bank items
+  const wordBankItems = useMemo(() => 
+    wordBank.map((word, idx) => (
+      <WordBankItem
+        key={`${word}-${idx}`}
+        word={word}
+        onInsert={textInsert}
+        onRemove={removeWord}
+      />
+    )), [wordBank, textInsert, removeWord]
+  );
 
   return (
     <div
       className="min-h-screen flex flex-col items-center bg-[#e8ebee] p-4 sm:p-8"
       onKeyDown={handleKeyDown}
       onKeyUp={handleKeyUp}
-      tabIndex={0} // Make div focusable for key events
+      tabIndex={0}
     >
       <div className="fixed top-6 right-6 z-20">
         <FaServer
@@ -265,18 +336,7 @@ export default function TextFormatter() {
           </div>
           <div className="flex flex-wrap gap-2">
             {wordBank.length > 0 ? (
-              wordBank.map((word, idx) => (
-                <div
-                  key={idx}
-                  className="group relative px-3 py-1 bg-white border border-blue-300 rounded-lg text-xs cursor-pointer hover:bg-blue-100 transition-colors"
-                >
-                  <span onClick={() => textInsert(word)} className="pr-2">{word}</span>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); removeWord(word); }}
-                    className="opacity-0 group-hover:opacity-100 absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] transition-opacity hover:bg-red-600"
-                  >×</button>
-                </div>
-              ))
+              wordBankItems
             ) : (
               <p className="text-xs text-gray-400">Select text in the area below to add to bank</p>
             )}
@@ -300,14 +360,12 @@ export default function TextFormatter() {
 
         <div className="flex flex-wrap gap-3 mt-8 justify-center">
           {buttons.map((btn, idx) => (
-            <button
+            <MemoizedButton
               key={idx}
+              label={btn.label}
+              color={btn.color}
               onClick={btn.onClick}
-              className={`relative bg-[#e8ebee] text-${btn.color} px-4 py-2 text-xs sm:text-sm md:text-sm font-semibold rounded-xl shadow-md`}
-              style={{ boxShadow: "3px 3px 6px #c1c4c8, -3px -3px 6px #ffffff", cursor: "pointer" }}
-            >
-              {btn.label}
-            </button>
+            />
           ))}
         </div>
 
