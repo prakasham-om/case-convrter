@@ -237,10 +237,10 @@ export default function TextFormatter() {
           if (ACRONYM_MAP.has(upper)) return ACRONYM_MAP.get(upper);
           if (UNCOUNTABLE.has(part.toLowerCase())) return capitalize(part);
 
-          let singular = part;
-          if (part.toLowerCase().endsWith("ies") && part.length > 3) singular = part.slice(0, -3) + "y";
-          else if (part.toLowerCase().endsWith("es") && part.length > 3) singular = part.slice(0, -2);
-          else if (part.toLowerCase().endsWith("s") && part.length > 3) singular = part.slice(0, -1);
+           let singular = part;
+           if (part.toLowerCase().endsWith("ies") && part.length > 3) singular = part.slice(0, -3) + "y";
+          // else if (part.toLowerCase().endsWith("es") && part.length > 3) singular = part.slice(0, -2);
+          // else if (part.toLowerCase().endsWith("s") && part.length > 3) singular = part.slice(0, -1);
 
           if (ALLOWED_SMALL_WORDS.has(singular.toLowerCase()) && index !== 0)
             return singular.toLowerCase();
@@ -369,7 +369,7 @@ export default function TextFormatter() {
           ))}
         </div>
 
-        <p className="mt-10 text-center text-gray-500 text-xs sm:text-sm">Powered by Pc</p>
+        <p className="mt-10 text-center text-gray-500 text-xs sm:text-sm">Powered by Siva</p>
       </div>
     </div>
   );
