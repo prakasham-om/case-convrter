@@ -2,7 +2,7 @@ const acronyms =[
   
   "AI", "ML", "NLP", "DL", "IoT","SaaS", "AR", "VR", "XR","UI", "UX", "API", "SDK", "IDE","SQL","DBMS","HTML", "CSS", "JS", "JSON", "XML","YAML",
   "IP", "TCP", "UDP", "HTTP", "HTTPS", "FTP","SSH","DNS", "VPN", "URL", "URI", "PDF", "CSV", "GIF","CPU", "GPU", "RAM", "ROM", "BIOS", "OS", "PC",
-  "USB", "SSD", "HDD", "VPS", "AWS", "GCP","SAP","IT","CNC",
+  "USB", "SSD", "HDD", "VPS", "AWS", "GCP","SAP","IT","CNC","3D","2D",
   "RF", "IR", "NFC", "RFID", "DC", "AC","LED", "LCD", "OLED", "HDMI", "VGA", "SLT","USB", "TTL", "UART", "SPI", "I2C", "PWM",
   "ADC", "DAC", "PCB", "PCBA", "MCU", "DSP","ASIC", "FPGA", "SoC", "IoE","IC", "MCU", "DSP", "ASIC", "FPGA", "SoC", "IoE",
   "PSU", "SMPS", "UPS", "CCTV", "GPS","GSM", "CDMA", "LTE", "5G", "4G", "3G", "WiFi","LAN", "WAN", "PAN", "MAN", "NVR", "DVR","PV",
